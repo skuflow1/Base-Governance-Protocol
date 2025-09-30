@@ -62,6 +62,7 @@ Emergency Procedures - Emergency governance mechanisms
 
 
 🛠️ Smart Contract Functions
+
 Core Functions:
 propose(address[] targets, bytes[] calldatas, uint256[] values, string description) - Create new proposal
 vote(uint256 proposalId, bool support) - Cast vote on proposal
@@ -69,6 +70,7 @@ executeProposal(uint256 proposalId) - Execute approved proposal
 cancelProposal(uint256 proposalId) - Cancel proposal
 delegate(address delegateAddress) - Delegate voting rights
 getProposalDetails(uint256 proposalId) - Get proposal details
+
 Events:
 ProposalCreated - Emitted when new proposal is created
 VoteCast - Emitted when vote is cast
@@ -76,24 +78,11 @@ ProposalExecuted - Emitted when proposal is executed
 ProposalCanceled - Emitted when proposal is canceled
 DelegationChanged - Emitted when delegation changes
 VotingPeriodExtended - Emitted when voting period is extended
+
 📊 Contract Structure
+
 Proposal Structure:
-solidity
 
-
-1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
 struct Proposal {
     uint256 proposalId;
     address proposer;
@@ -107,21 +96,18 @@ struct Proposal {
     bool quorumReached;
     bool proposalApproved;
 }
+
 Voter Structure:
-solidity
 
-
-1
-2
-3
-4
-5
 struct Voter {
     uint256 votingPower;
     uint256 delegatedTo;
     mapping(uint256 => bool) hasVoted;
 }
+
+
 ⚡ Deployment Process
+
 Prerequisites:
 Node.js >= 14.x
 npm >= 6.x
@@ -132,12 +118,10 @@ Deployment Steps:
 Configure your hardhat.config.js with Base network settings
 Set your private key in .env file
 Run deployment script:
-bash
-
-
-1
 npx hardhat run scripts/deploy.js --network base
+
 🔒 Security Considerations
+
 Security Measures:
 Reentrancy Protection - Using OpenZeppelin's ReentrancyGuard
 Input Validation - Comprehensive input validation
@@ -149,7 +133,10 @@ Audit Status:
 Initial security audit completed
 Formal verification in progress
 Community review underway
+
+
 📈 Performance Metrics
+
 Gas Efficiency:
 Proposal creation: ~100,000 gas
 Vote casting: ~50,000 gas
@@ -158,7 +145,9 @@ Delegation: ~30,000 gas
 Transaction Speed:
 Average confirmation time: < 2 seconds
 Peak throughput: 150+ transactions/second
+
 🔄 Future Enhancements
+
 Planned Features:
 Advanced Voting - Weighted voting and quadratic voting
 Multi-Signature Governance - Multi-signature proposal execution
@@ -166,7 +155,9 @@ Governance Analytics - Comprehensive governance analytics dashboard
 Cross-Chain Governance - Multi-chain governance integration
 Proposal Templates - Standardized proposal templates
 Governance Education - Educational resources for governance participation
+
 🤝 Contributing
+
 We welcome contributions to improve the Base Governance Protocol:
 
 Fork the repository
@@ -174,18 +165,11 @@ Create your feature branch (git checkout -b feature/AmazingFeature)
 Commit your changes (git commit -m 'Add some AmazingFeature')
 Push to the branch (git push origin feature/AmazingFeature)
 Open a pull request
+
 📄 License
+
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-📞 Support
-For support, please open an issue on our GitHub repository or contact us at:
 
-Email: support@basegovernance.com
-Twitter: @BaseGovernance
-Discord: Base Governance Community
-🌐 Links
-GitHub Repository: https://github.com/yourusername/base-governance
-Base Network: https://base.org
-Documentation: https://docs.basegovernance.com
-Community Forum: https://community.basegovernance.com
+
 Built with ❤️ on Base Network
