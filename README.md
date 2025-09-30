@@ -1,27 +1,20 @@
 Base Governance Protocol
+
 📋 Project Description
+
 Base Governance Protocol is a decentralized governance system that allows token holders to participate in protocol decision-making. The platform enables voting on proposals, managing governance parameters, and ensuring transparent community governance.
 
 🔧 Technologies Used
+
 Programming Language: Solidity 0.8.0
 Framework: Hardhat
 Network: Base Network
 Standards: ERC-20
 Libraries: OpenZeppelin
+
+
 🏗️ Project Architecture
 
-
-1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
 base-governance/
 ├── contracts/
 │   ├── GovernanceProtocol.sol
@@ -33,40 +26,24 @@ base-governance/
 ├── hardhat.config.js
 ├── package.json
 └── README.md
+
+
 🚀 Installation and Setup
+
 1. Clone the repository
-bash
-
-
-1
-2
-git clone https://github.com/yourusername/base-governance.git
+git clone https://github.com/skuflow1/Base-Governance-Protocol.git
 cd base-governance
 2. Install dependencies
-bash
-
-
-1
 npm install
 3. Compile contracts
-bash
-
-
-1
 npx hardhat compile
 4. Run tests
-bash
-
-
-1
 npx hardhat test
 5. Deploy to Base network
-bash
-
-
-1
 npx hardhat run scripts/deploy.js --network base
+
 💰 Features
+
 Core Functionality:
 ✅ Proposal creation and voting
 ✅ Token-based voting rights
@@ -74,6 +51,7 @@ Core Functionality:
 ✅ Proposal execution
 ✅ Delegate voting
 ✅ Transparent governance
+
 Advanced Features:
 Delegation System - Vote delegation to trusted representatives
 Quorum Requirements - Minimum participation thresholds
@@ -81,6 +59,8 @@ Voting Periods - Configurable voting durations
 Proposal Categories - Different types of proposals
 Governance Analytics - Voting statistics and analytics
 Emergency Procedures - Emergency governance mechanisms
+
+
 🛠️ Smart Contract Functions
 Core Functions:
 propose(address[] targets, bytes[] calldatas, uint256[] values, string description) - Create new proposal
