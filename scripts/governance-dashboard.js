@@ -1,4 +1,4 @@
-// base-governance/scripts/dashboard.js
+
 const { ethers } = require("hardhat");
 
 async function generateGovernanceDashboard() {
