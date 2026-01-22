@@ -20,7 +20,7 @@ async function analyzeGovernanceSecurity() {
   };
   
   try {
-    // Оценка безопасности
+
     const securityAssessment = await governance.getSecurityAssessment();
     securityReport.securityAssessment = {
       securityScore: securityAssessment.securityScore.toString(),
