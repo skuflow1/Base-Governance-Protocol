@@ -8,7 +8,7 @@ async function analyzeGovernanceSecurity() {
   const governanceAddress = "0x...";
   const governance = await ethers.getContractAt("GovernanceProtocolV2", governanceAddress);
   
-  // Анализ безопасности
+
   const securityReport = {
     timestamp: new Date().toISOString(),
     governanceAddress: governanceAddress,
