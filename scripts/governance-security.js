@@ -51,7 +51,7 @@ async function analyzeGovernanceSecurity() {
       regulatoryRisk: riskMetrics.regulatoryRisk.toString()
     };
     
-    // Контроль безопасности
+ 
     const securityControls = await governance.getSecurityControls();
     securityReport.securityControls = {
       accessControl: securityControls.accessControl,
