@@ -30,7 +30,7 @@ async function analyzeGovernanceSecurity() {
       riskLevel: securityAssessment.riskLevel
     };
     
-    // Сканирование уязвимостей
+
     const vulnerabilityScan = await governance.getVulnerabilityScan();
     securityReport.vulnerabilityScan = {
       criticalVulnerabilities: vulnerabilityScan.criticalVulnerabilities.toString(),
