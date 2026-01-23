@@ -41,7 +41,7 @@ async function analyzeGovernanceSecurity() {
       scanDate: vulnerabilityScan.scanDate.toString()
     };
     
-    // Метрики рисков
+
     const riskMetrics = await governance.getRiskMetrics();
     securityReport.riskMetrics = {
       totalRiskScore: riskMetrics.totalRiskScore.toString(),
