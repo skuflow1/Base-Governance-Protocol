@@ -209,4 +209,18 @@ contract GovernanceProtocolV2 is Ownable, ReentrancyGuard {
     function getVotingDelay() external view returns (uint256) {
         return votingDelay;
     }
+    // Добавить функции:
+function voteQuadratic(
+    uint256 proposalId,
+    bool support,
+    uint256 votes
+) external {
+    // Квадратичное голосование
+    // Количество голосов возводится в квадрат
+}
+
+function calculateQuadraticVotes(address user, uint256 amount) external view returns (uint256) {
+    // Расчет квадратичных голосов
+    return amount * amount;
+}
 }
