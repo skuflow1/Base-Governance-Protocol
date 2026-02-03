@@ -223,4 +223,204 @@ function calculateQuadraticVotes(address user, uint256 amount) external view ret
     // Расчет квадратичных голосов
     return amount * amount;
 }
+// Добавить структуры:
+struct Delegation {
+    address delegator;
+    address delegatee;
+    uint256 amount;
+    uint256 expirationTime;
+    uint256 delegationId;
+    bool active;
+    string purpose;
+}
+
+struct DelegationLimit {
+    address delegatee;
+    uint256 maxDelegatedAmount;
+    uint256 maxProposals;
+    uint256 delegationWindow;
+    bool enabled;
+    uint256 lastDelegationTime;
+}
+
+struct DelegationHistory {
+    address delegator;
+    address delegatee;
+    uint256 amount;
+    uint256 timestamp;
+    string action;
+}
+
+// Добавить маппинги:
+mapping(address => Delegation) public delegations;
+mapping(address => DelegationLimit) public delegationLimits;
+mapping(address => DelegationHistory[]) public delegationHistory;
+
+// Добавить события:
+event DelegationCreated(
+    address indexed delegator,
+    address indexed delegatee,
+    uint256 amount,
+    uint256 expirationTime,
+    string purpose
+);
+
+event DelegationUpdated(
+    address indexed delegator,
+    address indexed delegatee,
+    uint256 amount,
+    uint256 timestamp
+);
+
+event DelegationRevoked(
+    address indexed delegator,
+    address indexed delegatee,
+    uint256 timestamp
+);
+
+event DelegationLimitSet(
+    address indexed delegatee,
+    uint256 maxAmount,
+    uint256 maxProposals,
+    uint256 window,
+    bool enabled
+);
+
+// Добавить функции:
+function setDelegationLimit(
+    address delegatee,
+    uint256 maxDelegatedAmount,
+    uint256 maxProposals,
+    uint256 delegationWindow
+) external onlyOwner {
+    require(delegatee != address(0), "Invalid delegatee");
+    
+    delegationLimits[delegatee] = DelegationLimit({
+        delegatee: delegatee,
+        maxDelegatedAmount: maxDelegatedAmount,
+        maxProposals: maxProposals,
+        delegationWindow: delegationWindow,
+        enabled: true,
+        lastDelegationTime: block.timestamp
+    });
+    
+    emit DelegationLimitSet(delegatee, maxDelegatedAmount, maxProposals, delegationWindow, true);
+}
+
+function createDelegation(
+    address delegatee,
+    uint256 amount,
+    uint256 duration,
+    string memory purpose
+) external {
+    require(delegatee != address(0), "Invalid delegatee");
+    require(amount > 0, "Amount must be greater than 0");
+    require(balanceOf(msg.sender) >= amount, "Insufficient balance");
+    
+    // Check delegation limits
+    DelegationLimit storage limit = delegationLimits[delegatee];
+    require(limit.enabled, "Delegation not allowed");
+    require(block.timestamp >= limit.lastDelegationTime + limit.delegationWindow, "Delegation window not open");
+    
+    // Check maximum delegated amount
+    if (limit.maxDelegatedAmount > 0) {
+        uint256 totalDelegated = getTotalDelegated(delegatee);
+        require(totalDelegated + amount <= limit.maxDelegatedAmount, "Maximum delegation amount exceeded");
+    }
+    
+    // Create delegation
+    uint256 delegationId = uint256(keccak256(abi.encodePacked(msg.sender, delegatee, block.timestamp)));
+    
+    delegations[msg.sender] = Delegation({
+        delegator: msg.sender,
+        delegatee: delegatee,
+        amount: amount,
+        expirationTime: block.timestamp + duration,
+        delegationId: delegationId,
+        active: true,
+        purpose: purpose
+    });
+    
+    // Add to history
+    delegationHistory[msg.sender].push(DelegationHistory({
+        delegator: msg.sender,
+        delegatee: delegatee,
+        amount: amount,
+        timestamp: block.timestamp,
+        action: "created"
+    }));
+    
+    limit.lastDelegationTime = block.timestamp;
+    
+    emit DelegationCreated(msg.sender, delegatee, amount, block.timestamp + duration, purpose);
+}
+
+function updateDelegation(
+    address delegatee,
+    uint256 newAmount,
+    uint256 duration
+) external {
+    require(delegations[msg.sender].delegator == msg.sender, "No existing delegation");
+    require(delegatee == delegations[msg.sender].delegatee, "Invalid delegatee");
+    require(newAmount > 0, "Amount must be greater than 0");
+    require(balanceOf(msg.sender) >= newAmount, "Insufficient balance");
+    
+    // Update delegation
+    delegations[msg.sender].amount = newAmount;
+    delegations[msg.sender].expirationTime = block.timestamp + duration;
+    delegations[msg.sender].active = true;
+    
+    // Add to history
+    delegationHistory[msg.sender].push(DelegationHistory({
+        delegator: msg.sender,
+        delegatee: delegatee,
+        amount: newAmount,
+        timestamp: block.timestamp,
+        action: "updated"
+    }));
+    
+    emit DelegationUpdated(msg.sender, delegatee, newAmount, block.timestamp);
+}
+
+function revokeDelegation(address delegatee) external {
+    require(delegations[msg.sender].delegator == msg.sender, "No existing delegation");
+    require(delegatee == delegations[msg.sender].delegatee, "Invalid delegatee");
+    
+    // Revoke delegation
+    delegations[msg.sender].active = false;
+    
+    // Add to history
+    delegationHistory[msg.sender].push(DelegationHistory({
+        delegator: msg.sender,
+        delegatee: delegatee,
+        amount: delegations[msg.sender].amount,
+        timestamp: block.timestamp,
+        action: "revoked"
+    }));
+    
+    emit DelegationRevoked(msg.sender, delegatee, block.timestamp);
+}
+
+function getTotalDelegated(address delegatee) internal view returns (uint256) {
+    uint256 total = 0;
+    // Implementation would iterate through all delegations
+    return total;
+}
+
+function getDelegationInfo(address delegator) external view returns (Delegation memory) {
+    return delegations[delegator];
+}
+
+function getDelegationLimits(address delegatee) external view returns (DelegationLimit memory) {
+    return delegationLimits[delegatee];
+}
+
+function getDelegationHistory(address user) external view returns (DelegationHistory[] memory) {
+    return delegationHistory[user];
+}
+
+function getActiveDelegations() external view returns (address[] memory) {
+    // Implementation would return active delegations
+    return new address[](0);
+}
 }
