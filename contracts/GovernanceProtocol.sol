@@ -251,12 +251,11 @@ struct DelegationHistory {
     string action;
 }
 
-// Добавить маппинги:
 mapping(address => Delegation) public delegations;
 mapping(address => DelegationLimit) public delegationLimits;
 mapping(address => DelegationHistory[]) public delegationHistory;
 
-// Добавить события:
+
 event DelegationCreated(
     address indexed delegator,
     address indexed delegatee,
