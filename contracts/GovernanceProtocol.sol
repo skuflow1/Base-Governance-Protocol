@@ -101,7 +101,7 @@ contract GovernanceProtocolV2 is Ownable, ReentrancyGuard {
         emit ProposalCreated(proposalId, msg.sender, description, startTime, endTime);
     }
 
-    // Vote on proposal
+
     function vote(
         uint256 proposalId,
         bool support
@@ -215,8 +215,8 @@ function voteQuadratic(
     bool support,
     uint256 votes
 ) external {
-    // Квадратичное голосование
-    // Количество голосов возводится в квадрат
+
+
 }
 
 function calculateQuadraticVotes(address user, uint256 amount) external view returns (uint256) {
