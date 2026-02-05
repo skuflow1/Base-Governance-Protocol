@@ -433,7 +433,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 contract GovernanceProtocol is Ownable, ReentrancyGuard {
     using SafeMath for uint256;
 
-    // Существующие структуры и функции...
+
     
     // Новые структуры для делегирования с ограничениями
     struct Delegation {
