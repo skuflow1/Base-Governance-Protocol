@@ -430,7 +430,7 @@ function getActiveDelegations() external view returns (address[] memory) {
     return new address[](0);
 }
     
-    // Новые структуры для делегирования с ограничениями
+
     struct Delegation {
         address delegator;
         address delegatee;
