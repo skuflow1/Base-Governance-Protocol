@@ -112,9 +112,16 @@ contract GovernanceProtocolV2 is Ownable, ReentrancyGuard {
         require(!proposal.canceled, "Proposal canceled");
         require(!proposal.executed, "Proposal executed");
         require(!proposalVotes[proposalId][msg.sender].support, "Already voted");
-        
-        uint256 votingPower = token.balanceOf(msg.sender);
-        require(votingPower > 0, "No voting power");
+        require(block.timestamp >= proposal.startTime, "Voting not started");
+        require(block.timestamp <= proposal.endTime, "Voting ended");
+        require(!proposal.canceled, "Proposal canceled");
+        require(!proposal.executed, "Proposal executed");
+        require(!proposalVotes[proposalId][msg.sender].support, "Already voted");
+    
+    // Защита от переполнения
+    uint256 votingPower = balanceOf(msg.sender);
+    require(votingPower <= type(uint256).max, "Voting power overflow");
+    require(votingPower > 0, "No voting power");
         
         proposalVotes[proposalId][msg.sender] = Vote({
             support: support,
