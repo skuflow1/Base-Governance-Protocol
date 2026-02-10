@@ -1,75 +1,88 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "@openzeppelin/contracts/governance/Governor.sol";
-import "@openzeppelin/contracts/governance/extensions/GovernorCountingSimple.sol";
-import "@openzeppelin/contracts/governance/extensions/GovernorVotes.sol";
-import "@openzeppelin/contracts/governance/extensions/GovernorVotesQuorumFraction.sol";
+contract GovernanceProtocol {
+    uint256 public timelockDelay = 1 days;
 
-
-contract BaseGovernor is
-    Governor,
-    GovernorCountingSimple,
-    GovernorVotes,
-    GovernorVotesQuorumFraction,
-    GovernorTimelockControl
-{
-    uint48 private _votingDelayBlocks = 1;      // educational
-    uint32 private _votingPeriodBlocks = 45818; // ~1 week on 13s blocks, adjust for Base
-
-    constructor(IVotes token, TimelockController timelock)
-        Governor("BaseGovernor")
-        GovernorVotes(token)
-        GovernorVotesQuorumFraction(4) // 4% quorum
-        GovernorTimelockControl(timelock)
-    {}
-
-    function votingDelay() public view override returns (uint256) {
-        return _votingDelayBlocks;
+    struct Proposal {
+        address target;
+        uint256 value;
+        bytes data;
+        uint256 voteYes;
+        uint256 voteNo;
+        uint256 endTime;
+        bool queued;
+        uint256 eta;
+        bool executed;
     }
 
-    function votingPeriod() public view override returns (uint256) {
-        return _votingPeriodBlocks;
+    uint256 public proposalCount;
+    mapping(uint256 => Proposal) public proposals;
+    mapping(uint256 => mapping(address => bool)) public voted;
+
+    event Proposed(uint256 indexed id, address indexed target, uint256 value, uint256 endTime);
+    event Voted(uint256 indexed id, address indexed voter, bool support, uint256 weight);
+    event Queued(uint256 indexed id, uint256 eta);
+    event Executed(uint256 indexed id);
+
+    function setTimelockDelay(uint256 d) external {
+        timelockDelay = d;
     }
 
-    function proposalThreshold() public pure override returns (uint256) {
-        return 10_000e18; // educational threshold
+    function propose(address target, uint256 value, bytes calldata data, uint256 duration) external returns (uint256 id) {
+        require(target != address(0), "target=0");
+        id = ++proposalCount;
+        proposals[id] = Proposal({
+            target: target,
+            value: value,
+            data: data,
+            voteYes: 0,
+            voteNo: 0,
+            endTime: block.timestamp + duration,
+            queued: false,
+            eta: 0,
+            executed: false
+        });
+        emit Proposed(id, target, value, proposals[id].endTime);
     }
 
-    // required overrides
-    function state(uint256 proposalId) public view override(Governor, GovernorTimelockControl) returns (ProposalState) {
-        return super.state(proposalId);
+    function vote(uint256 id, bool support, uint256 weight) external {
+        Proposal storage p = proposals[id];
+        require(block.timestamp < p.endTime, "ended");
+        require(!voted[id][msg.sender], "voted");
+        voted[id][msg.sender] = true;
+
+        if (support) p.voteYes += weight;
+        else p.voteNo += weight;
+
+        emit Voted(id, msg.sender, support, weight);
     }
 
-    function _executeOperations(
-        uint256 proposalId,
-        address[] memory targets,
-        uint256[] memory values,
-        bytes[] memory calldatas,
-        bytes32 descriptionHash
-    ) internal override(Governor, GovernorTimelockControl) {
-        super._executeOperations(proposalId, targets, values, calldatas, descriptionHash);
+    function queue(uint256 id) external {
+        Proposal storage p = proposals[id];
+        require(block.timestamp >= p.endTime, "not ended");
+        require(!p.queued, "queued");
+        require(p.voteYes > p.voteNo, "not passed");
+
+        p.queued = true;
+        p.eta = block.timestamp + timelockDelay;
+
+        emit Queued(id, p.eta);
     }
 
-    function _cancel(
-        address[] memory targets,
-        uint256[] memory values,
-        bytes[] memory calldatas,
-        bytes32 descriptionHash
-    ) internal override(Governor, GovernorTimelockControl) returns (uint256) {
-        return super._cancel(targets, values, calldatas, descriptionHash);
+    function execute(uint256 id) external {
+        Proposal storage p = proposals[id];
+        require(p.queued, "not queued");
+        require(!p.executed, "executed");
+        require(block.timestamp >= p.eta, "timelocked");
+
+        p.executed = true;
+
+        (bool ok, ) = p.target.call{value: p.value}(p.data);
+        require(ok, "call failed");
+
+        emit Executed(id);
     }
 
-    function _executor() internal view override(Governor, GovernorTimelockControl) returns (address) {
-        return super._executor();
-    }
-
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        override(Governor, GovernorTimelockControl)
-        returns (bool)
-
-
-    }
+    receive() external payable {}
 }
