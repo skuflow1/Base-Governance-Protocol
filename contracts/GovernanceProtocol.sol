@@ -69,7 +69,7 @@ contract BaseGovernor is
         view
         override(Governor, GovernorTimelockControl)
         returns (bool)
-    {
-        return super.supportsInterface(interfaceId);
+
+
     }
 }
