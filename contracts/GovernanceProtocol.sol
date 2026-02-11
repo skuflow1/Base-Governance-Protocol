@@ -1,8 +1,8 @@
-
-
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
 
 contract GovernanceProtocol {
-    uint256 public timelockDelay = 1 days; 
+    uint256 public timelockDelay = 1 days;
 
     struct Proposal {
         address target;
@@ -58,6 +58,7 @@ contract GovernanceProtocol {
         emit Voted(id, msg.sender, support, weight);
     }
 
+    // Improvement: queue step with delay
     function queue(uint256 id) external {
         Proposal storage p = proposals[id];
         require(block.timestamp >= p.endTime, "not ended");
@@ -85,4 +86,4 @@ contract GovernanceProtocol {
     }
 
     receive() external payable {}
-} 
+}
