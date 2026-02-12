@@ -4,10 +4,13 @@ pragma solidity ^0.8.20;
 contract GovernanceProtocol {
     uint256 public timelockDelay = 1 days;
 
+    // Improvement
+    uint256 public quorum = 1;
+
     struct Proposal {
-       
-       
-      
+        address target;
+        uint256 value;
+        bytes data;
         uint256 voteYes;
         uint256 voteNo;
         uint256 endTime;
@@ -24,9 +27,17 @@ contract GovernanceProtocol {
     event Voted(uint256 indexed id, address indexed voter, bool support, uint256 weight);
     event Queued(uint256 indexed id, uint256 eta);
     event Executed(uint256 indexed id);
+    event QuorumUpdated(uint256 quorum);
+    event TimelockDelayUpdated(uint256 delay);
 
     function setTimelockDelay(uint256 d) external {
         timelockDelay = d;
+        emit TimelockDelayUpdated(d);
+    }
+
+    function setQuorum(uint256 q) external {
+        quorum = q;
+        emit QuorumUpdated(q);
     }
 
     function propose(address target, uint256 value, bytes calldata data, uint256 duration) external returns (uint256 id) {
@@ -58,16 +69,17 @@ contract GovernanceProtocol {
         emit Voted(id, msg.sender, support, weight);
     }
 
-    // Improvement: queue step with delay
     function queue(uint256 id) external {
         Proposal storage p = proposals[id];
         require(block.timestamp >= p.endTime, "not ended");
         require(!p.queued, "queued");
+
+        uint256 totalVotes = p.voteYes + p.voteNo;
+        require(totalVotes >= quorum, "quorum not met");
         require(p.voteYes > p.voteNo, "not passed");
 
         p.queued = true;
         p.eta = block.timestamp + timelockDelay;
-
         emit Queued(id, p.eta);
     }
 
