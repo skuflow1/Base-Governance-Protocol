@@ -7,7 +7,7 @@ contract GovernanceProtocol {
     struct Proposal {
        
        
-        bytes data;
+      
         uint256 voteYes;
         uint256 voteNo;
         uint256 endTime;
