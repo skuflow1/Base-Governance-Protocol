@@ -8,7 +8,7 @@ async function main() {
   console.log("Deploying contracts with the account:", deployer.address);
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
-  // Деплой токена
+
   const GovernanceToken = await ethers.getContractFactory("ERC20Token");
   const governanceToken = await GovernanceToken.deploy("Governance Token", "GOV");
   await governanceToken.deployed();
