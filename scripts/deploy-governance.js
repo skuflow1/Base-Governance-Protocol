@@ -13,7 +13,7 @@ async function main() {
   const governanceToken = await GovernanceToken.deploy("Governance Token", "GOV");
   await governanceToken.deployed();
 
-  // Деплой Governance Protocol контракта
+
   const GovernanceProtocol = await ethers.getContractFactory("GovernanceProtocolV2");
   const governance = await GovernanceProtocol.deploy(
     governanceToken.address,
