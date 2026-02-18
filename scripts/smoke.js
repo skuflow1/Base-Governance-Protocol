@@ -6,46 +6,41 @@ async function main() {
   const depPath = path.join(__dirname, "..", "deployments.json");
   const deployments = JSON.parse(fs.readFileSync(depPath, "utf8"));
 
-  const farmAddr = deployments.contracts.YieldFarm;
-  const stakeAddr = deployments.contracts.StakeToken;
-  const rewardAddr = deployments.contracts.RewardToken;
+  const govAddr = deployments.contracts.GovernanceProtocol;
+  const gov = await ethers.getContractAt("GovernanceProtocol", govAddr);
 
-  const [owner, user] = await ethers.getSigners();
-  const farm = await ethers.getContractAt("YieldFarm", farmAddr);
-  const stake = await ethers.getContractAt("RewardToken", stakeAddr);
-  const reward = await ethers.getContractAt("RewardToken", rewardAddr);
+  console.log("Gov:", govAddr);
 
-  console.log("YieldFarm:", farmAddr);
+  // propose sending 0 ETH to self (no-op call)
+  const [user] = await ethers.getSigners();
+  const data = "0x";
+  const tx = await gov.propose(user.address, 0, data, 10);
+  const r = await tx.wait();
+  const id = r.events.find((e) => e.event === "Proposed").args.id.toString();
+  console.log("Proposal id:", id);
 
-  // Mint some stake + rewards to owner, then fund farm
-  const amt = ethers.utils.parseUnits("100", 18);
-  await (await stake.mint(user.address, amt)).wait();
-  await (await reward.mint(owner.address, amt)).wait();
-  await (await reward.approve(farmAddr, amt)).wait();
-  await (await farm.fundRewards(amt)).wait();
-  console.log("Funded rewards");
+  await (await gov.vote(id, true, 1)).wait();
+  console.log("Voted yes");
 
-  // Stake
-  await (await stake.connect(user).approve(farmAddr, amt)).wait();
-  await (await farm.connect(user).deposit(amt)).wait();
-  console.log("Deposited");
-
-  // Mine a few blocks (hardhat local only)
   if (hre.network.name === "hardhat") {
-    for (let i = 0; i < 5; i++) await ethers.provider.send("evm_mine", []);
+    await ethers.provider.send("evm_increaseTime", [11]);
+    await ethers.provider.send("evm_mine", []);
   }
 
-  // Claim
-  await (await farm.connect(user).claim()).wait();
-  console.log("Claimed");
+  await (await gov.queue(id)).wait();
+  console.log("Queued");
 
-  // Emergency withdraw
-  await (await farm.connect(user).emergencyWithdraw()).wait();
-  console.log("EmergencyWithdraw OK");
+  if (hre.network.name === "hardhat") {
+    const delay = await gov.timelockDelay();
+    await ethers.provider.send("evm_increaseTime", [Number(delay) + 1]);
+    await ethers.provider.send("evm_mine", []);
+  }
+
+  await (await gov.execute(id)).wait();
+  console.log("Executed");
 }
 
 main().catch((e) => {
   console.error(e);
   process.exit(1);
 });
-
