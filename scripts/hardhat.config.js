@@ -43,8 +43,6 @@ module.exports = {
     apiKey: process.env.ETHERSCAN_API_KEY || ""
   },
 
-
-  // Keep default unless you have a custom /contracts path already.
   paths: {
     sources: "./contracts",
     tests: "./test",
