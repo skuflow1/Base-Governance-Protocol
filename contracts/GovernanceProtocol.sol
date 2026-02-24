@@ -4,7 +4,7 @@ pragma solidity ^0.8.20;
 contract GovernanceProtocol {
     uint256 public timelockDelay = 1 days;
 
-    // Improvement
+
     uint256 public quorum = 1;
 
     struct Proposal {
