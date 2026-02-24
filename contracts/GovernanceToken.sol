@@ -13,7 +13,7 @@ contract GovToken is ERC20Votes, Ownable {
         _mint(to, amount); 
     }
 
-    // required overrides
+  
     function _update(address from, address to, uint256 value) internal override(ERC20Votes) {
         super._update(from, to, value);
     }
