@@ -8,7 +8,7 @@ async function auditGovernanceProtocol() {
   const governanceAddress = "0x...";
   const governance = await ethers.getContractAt("GovernanceProtocolV2", governanceAddress);
   
-  // Аудит протокола
+
   const auditReport = {
     timestamp: new Date().toISOString(),
     governanceAddress: governanceAddress,
@@ -22,7 +22,7 @@ async function auditGovernanceProtocol() {
   };
   
   try {
-    // Сводка управления
+
     const governanceSummary = await governance.getGovernanceSummary();
     auditReport.governanceSummary = {
       totalProposals: governanceSummary.totalProposals.toString(),
