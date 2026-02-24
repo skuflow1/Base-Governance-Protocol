@@ -6,9 +6,8 @@ async function generateGovernanceDashboard() {
   
   const governanceAddress = "0x...";
   const governance = await ethers.getContractAt("GovernanceProtocolV2", governanceAddress);
-  
-  // Получение статистики
   const govStats = await governance.getGovernanceStats();
+  
   console.log("Governance Stats:", {
     totalProposals: govStats.totalProposals.toString(),
     activeProposals: govStats.activeProposals.toString(),
