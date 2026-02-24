@@ -98,4 +98,7 @@ contract GovernanceProtocol {
     }
 
     receive() external payable {}
+    function setTimelockDelay(uint256 newDelay) external onlyOwner {
+    timelockDelay = newDelay;
+}
 }
