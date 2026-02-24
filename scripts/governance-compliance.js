@@ -8,15 +8,15 @@ async function checkGovernanceCompliance() {
   const governanceAddress = "0x...";
   const governance = await ethers.getContractAt("GovernanceProtocolV2", governanceAddress);
   
-  // Получение информации о соответствии
+
   const complianceData = {};
   
-  // Проверка прав собственности
+
   const owner = await governance.owner();
   complianceData.owner = owner;
   console.log("Governance owner:", owner);
   
-  // Проверка кворума
+
   const quorum = await governance.getQuorum();
   complianceData.quorum = quorum.toString();
   console.log("Quorum requirement:", quorum.toString());
