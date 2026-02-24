@@ -8,7 +8,7 @@ async function generateGovernanceInsights() {
   const governanceAddress = "0x...";
   const governance = await ethers.getContractAt("GovernanceProtocolV2", governanceAddress);
   
-  // Получение инсайтов
+
   const insights = {
     timestamp: new Date().toISOString(),
     governanceAddress: governanceAddress,
