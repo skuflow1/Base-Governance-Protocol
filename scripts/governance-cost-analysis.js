@@ -8,7 +8,7 @@ async function analyzeGovernanceCosts() {
   const governanceAddress = "0x...";
   const governance = await ethers.getContractAt("GovernanceProtocolV2", governanceAddress);
   
-  // Анализ затрат
+
   const costReport = {
     timestamp: new Date().toISOString(),
     governanceAddress: governanceAddress,
@@ -20,7 +20,7 @@ async function analyzeGovernanceCosts() {
   };
   
   try {
-    // Разбивка затрат
+
     const costBreakdown = await governance.getCostBreakdown();
     costReport.costBreakdown = {
       developmentCost: costBreakdown.developmentCost.toString(),
