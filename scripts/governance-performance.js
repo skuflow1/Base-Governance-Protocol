@@ -61,7 +61,7 @@ async function analyzeGovernancePerformance() {
       futureGrowth: scalability.futureGrowth.toString()
     };
     
-    // Анализ производительности
+
     if (parseFloat(performanceReport.performanceMetrics.responseTime) > 2000) {
       performanceReport.recommendations.push("Optimize response time for better user experience");
     }
