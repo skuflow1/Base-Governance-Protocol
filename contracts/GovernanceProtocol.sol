@@ -5,7 +5,7 @@ contract GovernanceProtocol {
     uint256 public timelockDelay = 1 days;
 
 
-    uint256 public quorum = 1;
+    uint256 public quorum = 1; 
 
     struct Proposal {
         address target;
